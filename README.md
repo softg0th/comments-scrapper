@@ -1,35 +1,37 @@
 # Instagram & TikTok Comments Exporter
 
-Расширение для Chromium-браузеров, которое собирает с текущего Instagram Reel или TikTok:
+English | [Русский](README.ru.md)
 
-- никнейм автора;
-- описание ролика;
-- доступные комментарии;
-- ответы на комментарии с сохранением иерархии;
-- кликабельные ссылки на профили всех комментаторов и авторов ответов.
+A Manifest V3 extension for Chromium browsers that exports data from the current Instagram Reel or TikTok video:
 
-Результат автоматически скачивается как Markdown-файл.
+- the creator's username;
+- the video description;
+- all comments available on the page;
+- nested replies;
+- clickable profile links for commenters and reply authors.
 
-## Установка для разработки
+The extension downloads the result as a Markdown file.
 
-1. Откройте `chrome://extensions` в Chrome, Edge, Brave или другом Chromium-браузере.
-2. Включите **Режим разработчика**.
-3. Нажмите **Загрузить распакованное расширение**.
-4. Выберите папку этого репозитория.
-5. После первой установки или обновления расширения перезагрузите уже открытую вкладку Instagram или TikTok.
+## Install for development
 
-## Использование
+1. Open `chrome://extensions` in Chrome, Edge, Brave, or another Chromium browser.
+2. Enable **Developer mode**.
+3. Click **Load unpacked**.
+4. Select this repository's directory.
+5. Reload any Instagram or TikTok tabs that were already open.
 
-1. Авторизуйтесь в Instagram или TikTok в браузере.
-2. Откройте нужное видео:
-   - Instagram: отдельную страницу Reel (`/reel/.../` или `/reels/.../`) либо ролик в ленте `/reels/`;
-   - TikTok: отдельную страницу вида `/@username/video/id` (этот вариант наиболее надёжен).
-3. Нажмите иконку расширения и кнопку **Скачать отчёт**.
-4. Дождитесь окончания сбора. Прогресс и кнопка отмены показываются поверх страницы.
+## Usage
 
-Расширение последовательно раскрывает кнопки загрузки комментариев и ответов, прокручивает панель и завершает сбор после нескольких циклов без новых данных. Для TikTok используются `data-e2e`-маркеры интерфейса и резервные DOM-эвристики.
+1. Sign in to Instagram or TikTok in the browser.
+2. Open the video you want to export:
+   - Instagram: open a Reel page (`/reel/.../` or `/reels/.../`) or stop on a video in the `/reels/` feed;
+   - TikTok: open a page matching `/@username/video/id`. A dedicated video page gives the most reliable results.
+3. Click the extension icon, then click **Скачать отчёт**.
+4. Wait for the export to finish. The page shows progress and a cancel button while comments load.
 
-## Формат отчёта
+The extension expands the available comment and reply controls, scrolls the comment panel, and stops after several passes return no new data. The TikTok collector uses `data-e2e` attributes with DOM-based fallbacks.
+
+## Report format
 
 ```md
 # Instagram Reel — @author
@@ -51,27 +53,28 @@
     > Ответ
 ```
 
-## Ограничения MVP
+## Limitations
 
-- Instagram и TikTok не предоставляют стабильный публичный DOM/API для такого экспорта. После изменений интерфейса селекторы и эвристики могут потребовать обновления.
-- Собираются комментарии, доступные текущему аккаунту в веб-интерфейсе. Скрытые, удалённые, ограниченные или не загруженные платформой данные получить нельзя.
-- Для роликов с очень большим числом комментариев сбор может занять несколько минут. В коде установлен безопасный лимит циклов, чтобы исключить бесконечную загрузку.
-- Надёжнее всего экспортировать с отдельной страницы конкретного Reel или TikTok-видео.
+- The extension reads the page DOM. Instagram and TikTok can change their markup, which may require selector updates.
+- The export contains only comments available to the current account in the web interface. It cannot retrieve hidden, deleted, restricted, or unloaded data.
+- Videos with many comments may take several minutes to process. A cycle limit prevents the collector from running indefinitely.
+- Dedicated Reel and TikTok video pages produce the most reliable results.
 
-Используйте экспорт только там, где у вас есть право обрабатывать полученные данные, и учитывайте требования к персональным данным и правила платформ.
+Only process data that you are allowed to access and use. Follow the platforms' terms and applicable privacy rules.
 
-## Структура
+## Project structure
 
-- `manifest.json` — Manifest V3;
-- `icons/` — иконки 16/32/48/128 px для браузера;
-- `popup.html`, `popup.css`, `popup.js` — интерфейс расширения;
-- `content.js` — работа со страницей Instagram, загрузка и разбор комментариев;
-- `tiktok.js` — работа со страницей TikTok, загрузка и разбор комментариев;
-- `report.js` — генерация Markdown.
+- `manifest.json` — Manifest V3 configuration;
+- `icons/` — browser icons in 16, 32, 48, and 128 px sizes;
+- `popup.html`, `popup.css`, `popup.js` — extension popup;
+- `content.js` — Instagram comment loader and parser;
+- `tiktok.js` — TikTok comment loader and parser;
+- `report.js` — Markdown report generator;
+- `tests/report.test.js` — report and hierarchy tests.
 
-## Проверка
+## Checks
 
-Для проверки синтаксиса и генерации отчёта достаточно Node.js:
+Run the syntax checks and tests with Node.js:
 
 ```bash
 node --check popup.js
